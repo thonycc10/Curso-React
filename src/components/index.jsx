@@ -2,17 +2,19 @@ import React, { Component } from  'react';
 import PropTypes from 'prop-types';
 import CoursesList from "./CoursesList";
 import CoursesAddF from "./CoursesAddF";
+// formato de importar al salir de la carpeta externa
+import {courses} from "../data/courses"
+import uid from "uid"
 
 class App extends Component {
     constructor(...props){
         super(...props);
         this.state = {
-            courses: [
-                { id: 1, name: 'React desde cero', teacher: 'Jhonatan Mircha'},
-                { id: 2, name: 'Drupal 8 desde cero', teacher: 'Alberto Quirog'}
-            ]
+            courses: []
         }
-        this.handleOnAddCourse = this.handleOnAddCourse.bind(this);
+        this.handleOnAddCourse = this.handleOnAddCourse.bind(this)
+        this.fetchData = this.fetchData.bind(this)
+        this.resetData = this.resetData.bind(this)
     }
 
     // conocidos como manejadores -> eventos
@@ -36,6 +38,20 @@ class App extends Component {
 
         form.reset();
     }
+    //cada vez que se crea un metodo se debe bin en el controller.
+    fetchData(event) {
+// temporizador que recibe un callback y un tiempo en minisegundos para ejecutarce
+        setTimeout(() => this.setState({ courses:courses}), 2000)
+    }
+
+    resetData(event){
+        // resete el estado a nada
+        this.setState({ courses: []})
+    }
+
+    componentDidMount() { // se ejecuta despues del render
+        this.fetchData()
+    }
 
     // nodo hijo
 // {/*// llamando un component externo sin states*/}
@@ -43,26 +59,39 @@ class App extends Component {
 // {/*// se conoce como optimizando por pedasos de vistas*/}
 // {/*// le enviamos propiedades a los components hijo - courseList*/}
 // // se debe agregar en el form la variable creada
+    // creando componente dinamico if
     render(){
+        if( !this.state.courses.length){
+            return(
+                <div>
+                    <p>No hay cursos :c </p>
+                    <button onClick={this.fetchData}> Cargar Cursos </button>
+                </div>
+            )
+        }else{
         return(
             <div>
             <CoursesAddF onAddCourse={this.handleOnAddCourse}/>
             <CoursesList  courses={this.state.courses} />
+                <button onClick={this.resetData}> Borrar Cursos </button>
             </div>
         )
+        }
     }
 
 
 
 }
     App.propTypes =  {
-        id: PropTypes.number.isRequired,
+        id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         teacher: PropTypes.string.isRequired
     }
 
     // ayuda a validar el formulario a mostrar el mensaje alerrt
     App.defaultProps = {
+
+    id: uid(10),
     name: 'Campo nombre es requerido',
     teacher: 'Campor profe es requerido'
     }
